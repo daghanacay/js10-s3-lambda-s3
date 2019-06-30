@@ -1,9 +1,8 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  COIN
-
-  Sample SAM Template for COIN
+  
+  Sample SAM Template for s3-lambda-s3 function
   
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
@@ -12,16 +11,16 @@ Globals:
 
 Parameters:
   InputS3BucketName:
-    Default: s3-lambda-transcribe-input-audio-bucket
+    Default: s3-lambda-copy-input-bucket-daghan
     MinLength: 3
     Type: String
   OutputS3BucketName:
-    Default: s3-lambda-transcribe-output-text-bucket
+    Default: s3-lambda-copy-output-bucket-daghan
     MinLength: 3
     Type: String
 
 Resources:
-  LambdaFunction:
+  CopyFileLambdaFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       CodeUri: src/
@@ -34,33 +33,35 @@ Resources:
             Bucket: !Ref InputS3Bucket
             Events: s3:ObjectCreated:*
       Policies:
-# We need to add bucket read and write policy permission to lambda function
       - S3CrudPolicy:
-          BucketName: !Ref: OutputS3BucketName
-# Create input and output buckets
-  InputS3Bucket:
+          BucketName: !Ref OutputS3BucketName
+      - S3ReadPolicy:
+          BucketName: !Ref InputS3BucketName
+      Environment:
+        Variables:
+          OUTPUT_BUCKET: !Ref OutputS3Bucket
+
+  InputS3Bucket: # Create input and output buckets
     Type: AWS::S3::Bucket
     Properties:
-      BucketName:
-        Ref: InputS3BucketName
+      BucketName: !Ref InputS3BucketName
     
   OutputS3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName:
-        Ref: OutputS3BucketName
+      BucketName: !Ref OutputS3BucketName
     
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  LambdaFunction:
+  LambdaFunctionARN:
     Description: "Lambda Function ARN"
-    Value: !GetAtt LambdaFunction.Arn
+    Value: !GetAtt CopyFileLambdaFunction.Arn
   LambdaFunctionRole:
     Description: "Implicit IAM Role created for the lambda function"
-    Value: !GetAtt LambdaFunctionRole.Arn
+    Value: !GetAtt CopyFileLambdaFunctionRole.Arn
   InputS3Bucket:
     Description: "Input Bucket name"
     Value: !Ref InputS3Bucket

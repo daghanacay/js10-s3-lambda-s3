@@ -1,5 +1,7 @@
 {
-  "name": "hello_world",
+  "name": "copy_lambda",
+  "config": {"s3bucket":"my-test-bucket-for-sam-template",
+  "stackname":"s3-lambda-s3"},
   "version": "1.0.0",
   "description": "hello world sample for NodeJS",
   "main": "app.js",
@@ -10,7 +12,12 @@
     "axios": "^0.18.0"
   },
   "scripts": {
-    "test": "mocha tests/unit/"
+    "test": "mocha tests/unit/",
+    "test-event": "cd .. && sam local invoke CopyFileLambdaFunction --event event.json",
+    "build-code":"cd .. && sam build",
+    "package-code":"cd .. && sam package --output-template-file packaged.yaml --s3-bucket $npm_package_config_s3bucket",
+    "deploy-code":"cd .. && sam deploy --template-file packaged.yaml --stack-name $npm_package_config_stackname --capabilities CAPABILITY_IAM",
+    "release-code":"npm run build-code && npm run package-code && npm run deploy-code"
   },
   "devDependencies": {
     "chai": "^4.2.0",

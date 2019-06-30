@@ -1,33 +1,18 @@
-// const axios = require('axios')
-// const url = 'http://checkip.amazonaws.com/';
-let response;
+const s3Util = require('./s3-util'),
+  path = require('path'),
+  os = require('os'),
+  OUTPUT_BUCKET = process.env.OUTPUT_BUCKET
+  
+exports.lambdaHandler = async (eventObject, context) => {
+    const eventRecord = eventObject.Records && eventObject.Records[0],
+    inputBucket = eventRecord.s3.bucket.name,
+    key = eventRecord.s3.object.key,
+    id = context.awsRequestId,
+    tempPath = path.join(os.tmpdir(),  id)
+    
 
-/**
- *
- * Event doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html#api-gateway-simple-proxy-for-lambda-input-format
- * @param {Object} event - API Gateway Lambda Proxy Input Format
- *
- * Context doc: https://docs.aws.amazon.com/lambda/latest/dg/nodejs-prog-model-context.html 
- * @param {Object} context
- *
- * Return doc: https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-lambda-proxy-integrations.html
- * @returns {Object} object - API Gateway Lambda Proxy Output Format
- * 
- */
-exports.lambdaHandler = async (event, context) => {
-    try {
-        // const ret = await axios(url);
-        response = {
-            'statusCode': 200,
-            'body': JSON.stringify({
-                message: 'hello world',
-                // location: ret.data.trim()
-            })
-        }
-    } catch (err) {
-        console.log(err);
-        return err;
-    }
-
-    return response
+  console.log('copying', inputBucket, key, 'to', OUTPUT_BUCKET);
+  
+  return s3Util.downloadFileFromS3(inputBucket, key, tempPath)
+    .then(() => s3Util.uploadFileToS3(OUTPUT_BUCKET, key, tempPath));
 };
