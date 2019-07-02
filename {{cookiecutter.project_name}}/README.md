@@ -44,8 +44,14 @@ Firstly, we need a `S3 bucket` where we can upload our Lambda functions packaged
 ```bash
 aws s3 mb s3://BUCKET_NAME
 ```
+Go to template.yaml and  
+- Update InputS3BucketName, this should be a unique name and should be different than BUCKET_NAME
+- Update OutputS3BucketName, this should be a unique name and should be different than BUCKET_NAME
+Next, go to /src directory and update the src/package.json. 
+- s3bucket: release bucket for sam, this is same as BUCKET_NAME above
+- stackname: stack name for your stack, can be anything or you can leave the default value
 
-Next, updatet the package.json and run the following command to package our Lambda function to S3:
+Run the following command to build, package, and release full code to AWS:
 
 ```bash
 npm run release-code 

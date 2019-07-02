@@ -1,6 +1,6 @@
 {
   "name": "copy_lambda",
-  "config": {"s3bucket":"my-test-bucket-for-sam-template",
+  "config": {"s3bucket":"common-sam-deployment-package",
   "stackname":"s3-lambda-s3"},
   "version": "1.0.0",
   "description": "hello world sample for NodeJS",
