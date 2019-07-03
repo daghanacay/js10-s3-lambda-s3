@@ -4,11 +4,6 @@ Description: >
   
   Sample SAM Template for s3-lambda-s3 function
   
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
-Globals:
-  Function:
-    Timeout: 120
-
 Parameters:
   InputS3BucketName:
     Default: s3-lambda-copy-input-bucket-daghan
@@ -65,6 +60,8 @@ Outputs:
   InputS3Bucket:
     Description: "Input Bucket name"
     Value: !Ref InputS3Bucket
+    Export:
+      Value: InputS3BucketExport
   OutputS3Bucket:
     Description: "Output Bucket name"
     Value: !Ref OutputS3Bucket

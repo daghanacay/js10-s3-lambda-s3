@@ -110,17 +110,44 @@ In order to delete our Serverless Application recently deployed you can use the 
 aws cloudformation delete-stack --stack-name coin
 ```
 
-## Bringing to the next level
-
-Here are a few things you can try to get more acquainted with building serverless applications using SAM:
-
-### Learn how SAM Build can help you with dependencies
-
-* Uncomment lines on `app.js`
-* Build the project with ``sam build --use-container``
-
 ### Step-through debugging
 
 * **[Enable step-through debugging docs for supported runtimes]((https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-using-debugging.html))**
 
 Next, you can use AWS Serverless Application Repository to deploy ready to use Apps that go beyond hello world samples and learn how authors developed their applications: [AWS Serverless Application Repository main page](https://aws.amazon.com/serverless/serverlessrepo/)
+
+# Share application
+
+After you create your project then you can share it. Just package it by 
+- npm run build-code
+- nom run package-code
+and share it in S3
+- aws s3 mb s3://sam-application-stacks
+- aws s3 sync . s3://sam-application-stacks/[application name] --exclude ".aws-sam/*"
+See "# SAM Integration snippet" for details
+
+
+# Standalone deployment
+
+There are two parameters you can set on this template.
+
+InputS3BucketName:
+    Default: s3-lambda-copy-input-bucket-daghan
+OutputS3BucketName:
+  Default: s3-lambda-copy-output-bucket-daghan
+
+Exports the input bucket name as 
+      Name: InputS3BucketNameExport
+
+# SAM Integration snippet
+ see https://github.com/daghanacay/sam-integration-project
+```
+Resources:
+  detectSentimentAndWriteToDynamo:
+    Type: AWS::Serverless::Application
+    Properties:
+      Location: https://s3.amazonaws.com/sam-application-stacks/[application name]/template.yaml
+      Parameters: 
+        # InputS3BucketName: 's3-lambda-transcribe-input-audio-daghan'
+        # DynamoDBTableName: 's3-lambda-transcribe-output-text-daghan' # Uncomment to override default value  
+```
